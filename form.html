@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/css/materialize.min.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+  
+  <!-- This will fix the scroolbar caused by materialze.css --> 
+  <style>[class]{will-change:unset;-webkit-backface-visibility:visible}[type=checkbox]:checked+label:before{-webkit-backface-visibility:visible;backface-visibility:visible}</style>
+  <!-- This will set the header and footer sections of this app --> 
+  <style>main {top: 75px;bottom: 0px;width: 100%} body{margin:5;width:100%;height:100%;overflow-x:hidden}footer,header{position:fixed;width:100%}header{top:0}footer{bottom:0}main{position:absolute;border-top:2px solid #F2F2F2;border-bottom:2px solid #F2F2F2;overflow:auto;overflow-x:hidden}</style>
+  
+  <style>
+  .cur_row {display: inline-block;width:100%; } 
+  .collection-item {padding:0;}
+  .row {margin-bottom:0}
+  .requiredFalse input[type=text]{
+          border-bottom: 1px solid red;
+          box-shadow: 0 1px 0 0 red;
+  }
+   .requiredFalseRadio {
+          border-bottom: 1px solid red;
+          box-shadow: 0 1px 0 0 red;
+  }
+  
+  
+  </style>
+  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/js/materialize.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+  <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
+  
+  
+  <script>
+        $(function() {
+
+          google.script.run.withSuccessHandler(populateDefaults).withFailureHandler(fail).getDefaults();
+        });
+        
+        function fail(err){
+        console.log("fail");
+//        $("#fail").html(err);
+        
+        };
+        
+        function populateDefaults(defaults){
+         $( "#name" ).autocomplete({source: defaults.names});
+         $( "#cbNum" ).autocomplete({source: defaults.cbNum});
+         $( "#cbList" ).val( JSON.stringify(defaults.cbNum));
+        } // end populate defaults
+        
+        
+        function submit(){
+//        console.log($( "#cbList" ).val());
+//        return;
+        
+        
+//        $("#submitBtn").addClass("disabled");
+        var data = [];
+        var chk = $("input[name=chk]:checked").val();
+        var cbNum = $("#cbNum").val();
+        var name = $("#name").val();
+        var note = $("#note").val();
+        var cbListString = $( "#cbList" ).val();
+        var cbList = JSON.parse(cbListString);
+        
+        // validation
+        var cont = true;
+        //check if CB
+        var isCB = false;
+        for (i in cbList){
+            if (cbList[i] == cbNum){
+                isCB = true;
+                break;
+            }
+        }
+        
+        if (isCB == false){
+           $("#cbNum").closest(".input-field").addClass( "requiredFalse" ).click(function(){$(this).removeClass("requiredFalse")});
+           cont = false;
+        }
+        
+        if (!chk){
+        console.log("no check");
+           $("input[name=chk]").closest(".input-field").addClass( "requiredFalseRadio" ).click(function(){$(this).removeClass("requiredFalseRadio")});
+           cont = false;
+        }
+        
+       if (!name){
+           $("#name").closest(".input-field").addClass( "requiredFalse" ).click(function(){$(this).removeClass("requiredFalse")});
+           cont = false;
+        }
+        
+        
+        
+        
+        if (cont == false){
+//        console.log("cont = false");
+        return;
+        }
+        
+        
+        // build Array
+        var date = new Date(),
+        day = date.getDate(),
+        month = date.getMonth() + 1,
+        year = date.getFullYear(),
+        hours = date.getHours(),
+        minutes = date.getMinutes(),
+        seconds = date.getSeconds(),
+        TZOffset = date.getTimezoneOffset() / 60;
+        var timestamp = month + "/" + day + "/" + year + " " + hours + ":" + minutes + ":" + seconds;
+        
+        data.push(timestamp);
+        data.push(cbNum);
+        data.push(name);
+        data.push(chk);
+        data.push(note);
+
+        google.script.run.withSuccessHandler(sucess).withFailureHandler(fail).addToSheet([data]);
+        }
+        
+        
+        function sucess(){
+        $("#form :text").each(function(){
+        $(this).val("");
+//        $(this).trigger('autoresize');
+        //$(this).removeClass("active");
+        });
+     
+        $('input[name="chk"]').prop('checked', false);
+        
+        
+        Materialize.updateTextFields();
+//        $("#submitBtn").removeClass("disabled");
+        }
+        
+  
+  </script>
+  
+  
+  
+  
+  
+  
+  </head>
+  <body>
+      <header>
+  <div style="padding:20px">
+<div class="center">
+FHUHS Spare Chromebook Sign-out <br>
+<a href="https://docs.google.com/spreadsheets/d/1Y8WV8febZB8N0yi8m4g9plJTA_6VWgA8EJKR0qARkR8/edit#gid=1740659760">Spreadsheet</a>
+</div>
+
+
+  </div>
+  </header>
+  
+  <main style="padding:20px">
+  <input type="hidden" id="cbList">
+  
+  <div id="form">
+  
+  
+
+  <div class="row">
+  <div class="input-field col s2">
+  
+    <p>
+      <input name="chk" type="radio" id="chkIn" value="In"/>
+      <label for="chkIn">Check-In</label>
+    </p>
+    <p>
+      <input name="chk" type="radio" id="chkOut" value="Out" />
+      <label for="chkOut">Check-Out</label>
+    </p>
+  
+    </div>
+ <!--  </div>
+   <div class="row"> -->
+      
+        <div class="input-field col s3">
+         <!--<input placeholder="Spare#-##" id="cbNum" type="text"> -->
+          <input id="cbNum" type="text" class="validate">
+          <label for="cbNum">Chromebook Number:</label>
+        </div>
+        
+        <div class="input-field col s3">
+          <input id="name" type="text">
+          <label for="name">Name:</label>
+        </div>
+        <div class="input-field col s3">
+          <input id="note" type="text">
+          <label for="note">Note:</label>
+        </div>
+
+        </div>
+
+
+
+   
+  
+  </div> <!-- End id=form -->
+
+  
+   <center> <button id="submitBtn" onClick="submit()" class="waves-effect waves-light btn ">Submit</button> </center><br>
+  
+  
+<!--  <iframe src="https://docs.google.com/spreadsheets/d/1KZl3uMzUMnfpU_dbC72Z4YkSJcZ4cVOSygxfD48n5nc/pubhtml?gid=0&amp;single=true&amp;widget=true&amp;headers=false" width="100%" height="200"></iframe> -->
+  <iframe src="https://docs.google.com/spreadsheets/d/1Y8WV8febZB8N0yi8m4g9plJTA_6VWgA8EJKR0qARkR8/edit?hl=en&ui=2&chrome=false&rm=demo#gid=1740659760" width="100%" height="300"></iframe>
+  
+  
+  
+  </main>
+   
+   <footer>
+
+ 
+
+   
+   <div id="fail"></div>
+   </footer>
+   
+   <submitted style="display:none">
+   <br><br><br><br><br>
+   <center>
+   Thank you!<br>
+    <a href="https://script.google.com/a/macros/arsu.org/s/AKfycbzonmYbm2QnZyEe3Kh4LFudYB_59eSlHuTobszbksGa_QXUfphJ/exec" class="waves-effect waves-light btn">Submit Another</a>
+   
+   </center>
+   </submitted>
+   
+   
+   
+  </body>
+</html>
+
+
