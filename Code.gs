@@ -1,4 +1,4 @@
-//Latest: https://script.google.com/a/macros/arsu.org/s/AKfycbygNRG3LopebMK0Gv0rBeqeyFfJrFx4sen1JWZf3oc/dev
+
 
 
 function doGet(e) {
@@ -20,7 +20,7 @@ if(whatversion == "?"){
 function getDefaults(){
   var defaults = {};
 //  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var ss = SpreadsheetApp.openById("1Y8WV8febZB8N0yi8m4g9plJTA_6VWgA8EJKR0qARkR8");
+  var ss = SpreadsheetApp.openById("Your id goes here");
   
   //Get Names
   var nameSheet = ss.getSheetByName("Names");
@@ -40,17 +40,10 @@ function getDefaults(){
 
 
 function addToSheet(data){
-  Logger.log(data);
-//  return;
-//  data = [["Bjorn","6th","D'Avignon, Dylan","1","2","3","4"],["Bjorn","6th","Ducharme, Dwight","11","22","33","44"]];
-//  Logger.log(data.length);
-//  Logger.log(JSON.stringify(data));
-  var ss = SpreadsheetApp.openById("1Y8WV8febZB8N0yi8m4g9plJTA_6VWgA8EJKR0qARkR8");
+  var ss = SpreadsheetApp.openById("Your id goes here");
   var sheet = ss.getSheetByName("Data");
-//  sheet.getRange(ss.getLastRow()+1, 2, data.length, data[0].length).setValues(data);
   sheet.insertRowAfter(1);
   sheet.getRange(2, 1, 1, data[0].length).setValues(data);
-//  sheet.getRange(row, column, numRows, numColumns)
   return;
 }
 
